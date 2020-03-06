@@ -1,0 +1,3 @@
+[submodule "lib/libinjector"]
+	path = lib/libinjector
+	url = https://github.com/0xUKN/libinjector
