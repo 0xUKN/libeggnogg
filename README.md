@@ -7,7 +7,7 @@
 `make` : build both
 
 ## Installation
-`make install` : install Python bindings
+`make install` : install Python bindings\
 `make uninstall` : uninstall Python bindings
 
 ## Clean
