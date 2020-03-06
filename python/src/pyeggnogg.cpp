@@ -1,6 +1,7 @@
 #include <python3.8/Python.h>
 #include <iostream>
 #include <signal.h>
+#include <libgen.h>
 #include <limits.h>
 #include <unistd.h>
 #include "../../lib/libinjector/include/TracedProcess.hpp"
@@ -14,6 +15,7 @@ namespace LibEggnogg
 		static PyObject* init(PyObject* self, PyObject* args) {
 		char library_path[PATH_MAX];
 		char executable_path[PATH_MAX];
+		char executable_path_cpy[PATH_MAX];
 		char* library_name;
 		char* executable_name;
 		if(!PyArg_ParseTuple(args, "ss", &library_name, &executable_name))
@@ -43,7 +45,8 @@ namespace LibEggnogg
 			char * argv[] = {executable_name, NULL};
 			if (pid == 0) {
 				setenv("LD_PRELOAD", library_path, 1);
-				chdir(executable_path);
+				strncpy(executable_path_cpy, executable_path, PATH_MAX);
+				chdir(dirname(executable_path_cpy));
 				setsid();
 				signal(SIGHUP, SIG_IGN);
 				#ifndef DEBUG
@@ -51,7 +54,8 @@ namespace LibEggnogg
 				//close(1);
 				//close(2);
 				#endif
-				execve(executable_path, argv, environ);	
+				execve(executable_path, argv, environ);
+				perror("execve");
 			}
 			std::cout << "[+] PID : " << pid << std::endl;
 		}

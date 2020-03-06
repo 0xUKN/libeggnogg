@@ -24,10 +24,10 @@ directories:
 	-mkdir -p $(BUILD_DIR)/$(PYTHON_LIBRARY)
 	-mkdir -p $(BIN_DIR)/$(PYTHON_LIBRARY)
 
-$(PYTHON_LIBRARY):
+$(PYTHON_LIBRARY): directories
 	cd python && python3.8 setup.py build --build-base=../$(BUILD_DIR)/$(PYTHON_LIBRARY) install --prefix=../$(BIN_DIR)/$(PYTHON_LIBRARY)
 
-install:
+install: directories
 	cd python && python3.8 setup.py build --build-base=../$(BUILD_DIR)/$(PYTHON_LIBRARY) install
 
 uninstall:
