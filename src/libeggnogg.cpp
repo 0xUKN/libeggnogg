@@ -6,20 +6,23 @@
 #include "../include/libeggnogg.hpp"
 #include "../lib/libeggnogg_shmem/include/libeggnogg_shmem.hpp"
 #include "../include/libeggnogg_rpc.hpp"
-#define DEBUG
+//#define DEBUG
 #define SHMEM "eggnogg_shmem"
 #define LIBSDL "/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.10.0"
 #define SDL_NumJoysticks_GOT 0x665158
 #define LOGIC_RATE_ADDRESS 0x665418
+#define LIFE_OFFSET 0x9a
+#define PLAYER1_ADDRESS 0x75b3e0
+#define PLAYER2_ADDRESS 0x75b540
 
 namespace LibEggnogg
 {
 	__attribute__((constructor))void _init(void)
 	{
 		void * libSDL_handle;
-		GameState* gs;
 
 		puts("[+] Library loaded !");
+
 		std::thread background_task(init_libeggnogg_rpc_serv); 
 		background_task.detach();
 		atexit(exit_libeggnogg_rpc_serv);
@@ -27,6 +30,7 @@ namespace LibEggnogg
 
 		logic_rate = (unsigned long*)LOGIC_RATE_ADDRESS;
 		SDL_NumJoysticks_real_GOT = (void**)SDL_NumJoysticks_GOT;
+		*SDL_NumJoysticks_real_GOT = (void*)&SDL_NumJoysticks_hook;
 
 		if((libSDL_handle = dlopen(LIBSDL, RTLD_LAZY)) == NULL)
 		{
@@ -45,24 +49,15 @@ namespace LibEggnogg
 		}
 		memset(gs, 0, sizeof(LibEggnogg::GameState));
 
-		*SDL_NumJoysticks_real_GOT = (void*)&SDL_NumJoysticks_hook;
 		#ifdef DEBUG
 		*logic_rate = 5;
 		printf("Real SDL_NumJoysticks address : %p\n", SDL_NumJoysticks_real);
 		printf("Fake SDL_NumJoysticks address : %p\n", SDL_NumJoysticks_hook);
 		printf("GOT SDL_NumJoysticks value : %p\n", *SDL_NumJoysticks_real_GOT);
 		#endif
+
+		puts("[+] Shared memory initialization successful !");
 		puts("[+] Main loop hooking successful !");
-	}
-
-	GameState* InitGameState()
-	{
-		return (GameState*)CreateSharedMemory(SHMEM, sizeof(LibEggnogg::GameState));
-	}
-
-	void CloseSharedMemory()
-	{
-		RemoveSharedMemory(SHMEM);
 	}
 
 	int SDL_NumJoysticks_hook(void)
@@ -70,11 +65,30 @@ namespace LibEggnogg
 		#ifdef DEBUG
 		puts("[+] Main loop hook called !");
 		#endif
-		
-		
+
+		UpdateGameState();
 		return ((int (*)(void))SDL_NumJoysticks_real)();
 	}
 
+	//Shared Memory Functions
+	GameState* InitGameState()
+	{
+		return (GameState*)CreateSharedMemory(SHMEM, sizeof(LibEggnogg::GameState));
+	}
+
+	void UpdateGameState()
+	{
+		gs->player1.life = *(char *)(PLAYER1_ADDRESS + LIFE_OFFSET);
+		gs->player2.life = *(char *)(PLAYER2_ADDRESS + LIFE_OFFSET);
+	}
+
+	void CloseSharedMemory()
+	{
+		RemoveSharedMemory(SHMEM);
+	}
+
+
+	//RPC Functions
 	void * set_speed_3_svc(u_long *argp, struct svc_req *rqstp)
 	{
 		static char * result;
@@ -91,4 +105,3 @@ namespace LibEggnogg
 	}
 
 }
-//g++ -shared -fPIC libeggnogg.cpp rpc/libeggnogg_rpc_svc.cpp -o libeggnogg.so -ldl

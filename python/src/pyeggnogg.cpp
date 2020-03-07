@@ -4,15 +4,26 @@
 #include <libgen.h>
 #include <limits.h>
 #include <unistd.h>
+#define SHMEM "eggnogg_shmem"
 #include "../../lib/libinjector/include/TracedProcess.hpp"
 #include "../../include/libeggnogg_rpc.hpp"
+#include "../../include/pyeggnogg.hpp"
 //#define DEBUG
 
 namespace LibEggnogg
 {
-		static 	CLIENT *clnt;
+	GameState* InitGameState()
+	{
+		return (GameState*)CreateSharedMemory(SHMEM, sizeof(LibEggnogg::GameState));
+	}
 
-		static PyObject* init(PyObject* self, PyObject* args) {
+	void CloseSharedMemory()
+	{
+		RemoveSharedMemory(SHMEM);
+	}
+
+	static PyObject* init(PyObject* self, PyObject* args) 
+	{
 		char library_path[PATH_MAX];
 		char executable_path[PATH_MAX];
 		char executable_path_cpy[PATH_MAX];
@@ -79,12 +90,26 @@ namespace LibEggnogg
 			PyErr_SetString(PyExc_RuntimeError, "[-] Failed to initialize RPC client");
 			return nullptr;
 		}
+
+		gs = InitGameState();
+		if(gs == NULL)
+		{
+			fprintf(stderr, "[-] Game state initialization failed !\n");
+			PyErr_SetString(PyExc_RuntimeError, "[-] Game state initialization failed !");
+			return nullptr;
+		}
 		return Py_True;
 	}
-
 	static char init_docs[] = "init(): Load eggnogg library in process memory\n";
 
-	static PyObject* setSpeed(PyObject* self, PyObject* args) {
+	static PyObject* getGameState(PyObject* self) 
+	{
+		return Py_BuildValue("{s:i,s:i}", "player1_life", gs->player1.life, "player2_life", gs->player2.life);
+	}
+	static char getGameState_docs[] = "getGameState: Get updated game state\n";
+
+	static PyObject* setSpeed(PyObject* self, PyObject* args) 
+	{
 		void  *result_1;
 		u_long  set_speed_3_arg;
 		if(!PyArg_ParseTuple(args, "l", &set_speed_3_arg))
@@ -98,10 +123,10 @@ namespace LibEggnogg
 		}
 		return Py_BuildValue("");
 	}
-
 	static char setSpeed_docs[] = "setSpeed(speed): Set game speed\n";
 
-	static PyObject* getSpeed(PyObject* self) {
+	static PyObject* getSpeed(PyObject* self) 
+	{
 		u_long  *result_2;
 		char *get_speed_3_arg;
 		result_2 = get_speed_3((void*)&get_speed_3_arg, clnt);
@@ -111,17 +136,19 @@ namespace LibEggnogg
 		}
 		return Py_BuildValue("l", *result_2);
 	}
-
 	static char getSpeed_docs[] = "getSpeed(): Get game speed\n";
 
-	static PyMethodDef pyeggnogg_funcs[] = { 
+	static PyMethodDef pyeggnogg_funcs[] = 
+	{ 
 		{"init", (PyCFunction)init, METH_VARARGS, init_docs}, 
 		{"setSpeed", (PyCFunction)setSpeed, METH_VARARGS, setSpeed_docs}, 
 		{"getSpeed", (PyCFunction)getSpeed, METH_NOARGS, getSpeed_docs},
+		{"getGameState", (PyCFunction)getGameState, METH_NOARGS, getGameState_docs},
 		{NULL}
 	};
 
-	static struct PyModuleDef moduledef = {
+	static struct PyModuleDef moduledef = 
+	{
 		PyModuleDef_HEAD_INIT,
 		"pyeggnogg",     /* m_name */
 		"Additional functions for eggnoggplus",  /* m_doc */
