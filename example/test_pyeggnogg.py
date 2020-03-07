@@ -9,9 +9,10 @@ executable_path = "../../eggnoggplus"
 
 EggNogg.init(lib_path, executable_path)
 print("Current speed %d" % EggNogg.getSpeed())
-time.sleep(2)
+time.sleep(5)
 EggNogg.setSpeed(15)
 print("Current speed %d" % EggNogg.getSpeed())
-for i in range(1):
-	time.sleep(10)
-	print(EggNogg.getGameState())
+#for i in range(10):
+#	time.sleep(5)
+#	print(EggNogg.getGameState())
+print(EggNogg.getGameState())

@@ -93,7 +93,35 @@ namespace LibEggnogg
 
 	static PyObject* getGameState(PyObject* self) 
 	{
-		return Py_BuildValue("{s:{s:i},s:{s:i}}", "player1", "life", gs->player1.life, "player2", "life", gs->player2.life);
+		return Py_BuildValue("{s:{s:i, s:f, s:f, s:O, s:f, s:f, s:i, s:i, s:i, s:i, s:i},s:{s:i, s:f, s:f, s:O, s:f, s:f, s:i, s:i, s:i, s:i, s:i}, s:i, s:i, s:i, s:i}", 
+			"player1", 
+				"life", gs->player1.life, 
+				"pos_x", gs->player1.pos_x, 
+				"pos_y", gs->player1.pos_y, 
+				"hasSword", gs->player1.hasSword ? Py_True : Py_False, 
+				"sword_pos_x", gs->player1.sword_pos_x, 
+				"sword_pos_y", gs->player1.sword_pos_y, 
+				"direction", gs->player1.direction, 
+				"bounce_ctr", gs->player1.bounce_ctr, 
+				"situation", gs->player1.situation, 
+				"keys_pressed", gs->player1.keys_pressed, 
+				"action", gs->player1.action, 
+			"player2", 
+				"life", gs->player2.life, 
+				"pos_x", gs->player2.pos_x, 
+				"pos_y", gs->player2.pos_y, 
+				"hasSword", gs->player2.hasSword ? Py_True : Py_False, 
+				"sword_pos_x", gs->player2.sword_pos_x, 
+				"sword_pos_y", gs->player2.sword_pos_y, 
+				"direction", gs->player2.direction, 
+				"bounce_ctr", gs->player2.bounce_ctr,
+				"situation", gs->player2.situation, 
+				"keys_pressed", gs->player2.keys_pressed, 
+				"action", gs->player2.action,
+			"leader", gs->leader,
+			"room_number", gs->room_number,
+			"total_room_number", gs->total_room_number,
+			"nb_swords", gs->nb_swords);
 	}
 	static char getGameState_docs[] = "getGameState: Get updated game state\n";
 
