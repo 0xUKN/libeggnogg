@@ -4,7 +4,6 @@
 #include <libgen.h>
 #include <limits.h>
 #include <unistd.h>
-#define SHMEM "eggnogg_shmem"
 #include "../../lib/libinjector/include/TracedProcess.hpp"
 #include "../../include/libeggnogg_rpc.hpp"
 #include "../../include/pyeggnogg.hpp"
@@ -12,16 +11,6 @@
 
 namespace LibEggnogg
 {
-	GameState* InitGameState()
-	{
-		return (GameState*)CreateSharedMemory(SHMEM, sizeof(LibEggnogg::GameState));
-	}
-
-	void CloseSharedMemory()
-	{
-		RemoveSharedMemory(SHMEM);
-	}
-
 	static PyObject* init(PyObject* self, PyObject* args) 
 	{
 		char library_path[PATH_MAX];
@@ -104,7 +93,7 @@ namespace LibEggnogg
 
 	static PyObject* getGameState(PyObject* self) 
 	{
-		return Py_BuildValue("{s:i,s:i}", "player1_life", gs->player1.life, "player2_life", gs->player2.life);
+		return Py_BuildValue("{s:{s:i},s:{s:i}}", "player1", "life", gs->player1.life, "player2", "life", gs->player2.life);
 	}
 	static char getGameState_docs[] = "getGameState: Get updated game state\n";
 

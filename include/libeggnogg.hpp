@@ -10,8 +10,5 @@ namespace LibEggnogg
 	void _init(void);
 
 	int SDL_NumJoysticks_hook(void);
-
-	GameState* InitGameState();
-	void CloseSharedMemory();
 	void UpdateGameState();
 }

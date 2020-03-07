@@ -7,7 +7,6 @@
 #include "../lib/libeggnogg_shmem/include/libeggnogg_shmem.hpp"
 #include "../include/libeggnogg_rpc.hpp"
 //#define DEBUG
-#define SHMEM "eggnogg_shmem"
 #define LIBSDL "/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.10.0"
 #define SDL_NumJoysticks_GOT 0x665158
 #define LOGIC_RATE_ADDRESS 0x665418
@@ -71,22 +70,11 @@ namespace LibEggnogg
 	}
 
 	//Shared Memory Functions
-	GameState* InitGameState()
-	{
-		return (GameState*)CreateSharedMemory(SHMEM, sizeof(LibEggnogg::GameState));
-	}
-
 	void UpdateGameState()
 	{
 		gs->player1.life = *(char *)(PLAYER1_ADDRESS + LIFE_OFFSET);
 		gs->player2.life = *(char *)(PLAYER2_ADDRESS + LIFE_OFFSET);
 	}
-
-	void CloseSharedMemory()
-	{
-		RemoveSharedMemory(SHMEM);
-	}
-
 
 	//RPC Functions
 	void * set_speed_3_svc(u_long *argp, struct svc_req *rqstp)
