@@ -1,3 +1,5 @@
+#include "../lib/libeggnogg_shmem/include/libeggnogg_shmem.hpp"
+
 namespace LibEggnogg
 {
 	static unsigned long* logic_rate;
@@ -5,4 +7,6 @@ namespace LibEggnogg
 	static void* SDL_NumJoysticks_real;
 	void _init(void);
 	int SDL_NumJoysticks_hook(void);
+	GameState* InitGameState();
+	void CloseSharedMemory();	
 }
