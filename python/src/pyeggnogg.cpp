@@ -93,7 +93,17 @@ namespace LibEggnogg
 
 	static PyObject* getGameState(PyObject* self) 
 	{
-		return Py_BuildValue("{s:{s:i, s:f, s:f, s:O, s:f, s:f, s:i, s:i, s:i, s:i, s:i},s:{s:i, s:f, s:f, s:O, s:f, s:f, s:i, s:i, s:i, s:i, s:i}, s:i, s:i, s:i, s:i}", 
+		char sword_name[20];
+		PyObject * sword_list = PyDict_New();
+		for (int i = 0; i < gs->nb_swords; i++) 
+		{
+			snprintf(sword_name, 20, "sword%d", i+1);
+			PyObject * sword = PyDict_New();
+			PyDict_SetItemString(sword, "pos_x", PyFloat_FromDouble(gs->swords[i].pos_x));
+			PyDict_SetItemString(sword, "pos_y", PyFloat_FromDouble(gs->swords[i].pos_y));
+			PyDict_SetItemString(sword_list, sword_name, sword);
+		}
+		return Py_BuildValue("{s:{s:i, s:f, s:f, s:O, s:f, s:f, s:i, s:i, s:i, s:i, s:i},s:{s:i, s:f, s:f, s:O, s:f, s:f, s:i, s:i, s:i, s:i, s:i}, s:i, s:i, s:i, s:i, s:O}", 
 			"player1", 
 				"life", gs->player1.life, 
 				"pos_x", gs->player1.pos_x, 
@@ -121,7 +131,8 @@ namespace LibEggnogg
 			"leader", gs->leader,
 			"room_number", gs->room_number,
 			"total_room_number", gs->total_room_number,
-			"nb_swords", gs->nb_swords);
+			"nb_swords", gs->nb_swords,
+			"swords", sword_list);
 	}
 	static char getGameState_docs[] = "getGameState: Get updated game state\n";
 
@@ -138,7 +149,7 @@ namespace LibEggnogg
 			PyErr_SetString(PyExc_RuntimeError, "[-] setSpeed : RPC call failed");
 			return nullptr;
 		}
-		return Py_BuildValue("");
+		return Py_None;
 	}
 	static char setSpeed_docs[] = "setSpeed(speed): Set game speed\n";
 
@@ -151,7 +162,7 @@ namespace LibEggnogg
 			PyErr_SetString(PyExc_RuntimeError, "[-] getSpeed : RPC call failed");
 			return nullptr;
 		}
-		return Py_BuildValue("l", *result_2);
+		return PyLong_FromUnsignedLong(*result_2);
 	}
 	static char getSpeed_docs[] = "getSpeed(): Get game speed\n";
 

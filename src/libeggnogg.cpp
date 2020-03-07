@@ -27,6 +27,8 @@
 #define ROOM_NUMBER_ADDRESS 0x75b268
 #define TOTAL_ROOM_NUMBER_ADDRESS 0x763938
 #define NUM_THINGS_ALLOCATED_ADDRESS 0x75c880
+#define THINGS_ADDRESS 0x75b280
+#define THINGS_SIZE 0x160
 
 namespace LibEggnogg
 {
@@ -263,6 +265,17 @@ namespace LibEggnogg
 		gs->total_room_number = (*(unsigned char *)(TOTAL_ROOM_NUMBER_ADDRESS)) * 2 - 1;
 
 		gs->nb_swords = (*(unsigned char *)(NUM_THINGS_ALLOCATED_ADDRESS)) - 2; //2 things allocated are the 2 players
+
+		int swords_written = 0;
+		for(long i = 0; i < 0x10 && swords_written < gs->nb_swords; i++)
+		{
+			char * thing = (char *)(THINGS_ADDRESS + THINGS_SIZE * i);
+			if(*thing != 0 && *(thing+1) == 2)
+			{
+				gs->swords[swords_written] = {*(float *)(thing + POSX_OFFSET), *(float *)(thing + POSY_OFFSET)};
+				swords_written++;
+			}
+		}
 	}
 
 	//RPC Functions
