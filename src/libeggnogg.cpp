@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/mman.h>
 #include <signal.h>
 #include <dlfcn.h>
 #include <thread>
@@ -30,6 +31,8 @@
 #define NUM_THINGS_ALLOCATED_ADDRESS 0x75c880
 #define THINGS_ADDRESS 0x75b280
 #define THINGS_SIZE 0x160
+#define WIN_HOOK_ADRESS
+#define WIN_HOOK_SIZE 
 
 namespace LibEggnogg
 {
@@ -138,8 +141,8 @@ namespace LibEggnogg
 			gs->player2.sword_pos_y = -1;
 		}
 
-		gs->player1.bounce_ctr = (*(signed char *)(PLAYER1_ADDRESS + DIRECTION_OFFSET));
-		gs->player2.bounce_ctr = (*(signed char *)(PLAYER2_ADDRESS + DIRECTION_OFFSET));
+		gs->player1.direction = (*(signed char *)(PLAYER1_ADDRESS + DIRECTION_OFFSET));
+		gs->player2.direction = (*(signed char *)(PLAYER2_ADDRESS + DIRECTION_OFFSET));
 		//-1 left +1 right
 
 		gs->player1.bounce_ctr = __builtin_popcount(*(unsigned char *)(PLAYER1_ADDRESS + BOUNCE_CTR_OFFSET));
