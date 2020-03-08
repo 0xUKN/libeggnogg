@@ -85,6 +85,16 @@ namespace LibEggnogg
 		return ((int (*)(void))SDL_NumJoysticks_real)();
 	}
 
+	/*void SDL_NumJoysticks_hook(void)
+	{
+		#ifdef DEBUG
+		puts("[+] Main loop hook called !");
+		#endif
+
+		UpdateGameState();
+		return ((int (*)(void))SDL_NumJoysticks_real)();
+	}*/
+
 	//Shared Memory Functions
 	void UpdateGameState()
 	{
