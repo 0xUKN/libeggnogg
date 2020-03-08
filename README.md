@@ -1,6 +1,9 @@
 # libeggnogg
 *Binary instrumentation library for EGGNOGG+ by Madgarden*
 
+## Requirements
+- rpcbind
+
 ## Build
 `make libeggnogg.so` : build the instrumentation + hooking library\
 `make pyeggnogg` : build Python bindings and install in local bin folder\

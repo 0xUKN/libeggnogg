@@ -36,7 +36,7 @@ namespace LibEggnogg
 		}
 		executable_name = strrchr(executable_path, '/') + 1;
 
-		LibraryInjector::TracedProcess* proc = LibraryInjector::Attach(executable_name);
+		LibraryInjector::TracedProcess* proc = LibraryInjector::AttachByName(executable_name);
 		if(proc == NULL) 
 		{ 
 			std::cerr << "[+] " << executable_name << " is not running ..." << std::endl;

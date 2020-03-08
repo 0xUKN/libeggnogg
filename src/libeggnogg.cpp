@@ -5,9 +5,10 @@
 #include <thread>
 #include "../include/libeggnogg.hpp"
 #include "../lib/libeggnogg_shmem/include/libeggnogg_shmem.hpp"
+#include "../lib/libinjector/include/Utils.hpp"
 #include "../include/libeggnogg_rpc.hpp"
 //#define DEBUG
-#define LIBSDL "/usr/lib/x86_64-linux-gnu/libSDL2-2.0.so.0.10.0"
+#define LIBSDL_PREFIX "libSDL"
 #define SDL_NumJoysticks_GOT 0x665158
 #define LOGIC_RATE_ADDRESS 0x665418
 #define LIFE_OFFSET 0x9a
@@ -35,6 +36,7 @@ namespace LibEggnogg
 	__attribute__((constructor))void _init(void)
 	{
 		void * libSDL_handle;
+		std::string LIBSDL;
 
 		puts("[+] Library loaded !");
 
@@ -47,10 +49,15 @@ namespace LibEggnogg
 		SDL_NumJoysticks_real_GOT = (void**)SDL_NumJoysticks_GOT;
 		*SDL_NumJoysticks_real_GOT = (void*)&SDL_NumJoysticks_hook;
 
-		if((libSDL_handle = dlopen(LIBSDL, RTLD_LAZY)) == NULL)
+		if((LIBSDL = LibraryInjector::Utils::GetLibraryFullName(LIBSDL_PREFIX, -1)).length() == 0)
 		{
 			fprintf(stderr, "[-] Hooking failed : could not find libSDL !\n");
 			throw std::runtime_error("[-] Hooking failed : could not find libSDL !");
+		}
+		if((libSDL_handle = dlopen(LIBSDL.c_str(), RTLD_LAZY)) == NULL)
+		{
+			fprintf(stderr, "[-] Hooking failed : could not get handle to libSDL !\n");
+			throw std::runtime_error("[-] Hooking failed : could not get handle to libSDL !");
 		}
 		if((SDL_NumJoysticks_real = dlsym(libSDL_handle, "SDL_NumJoysticks")) == NULL)
 		{
