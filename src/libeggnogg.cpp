@@ -145,9 +145,9 @@ namespace LibEggnogg
 		gs->player2.direction = (*(signed char *)(PLAYER2_ADDRESS + DIRECTION_OFFSET));
 		//-1 left +1 right
 
-		gs->player1.bounce_ctr = __builtin_popcount(*(unsigned char *)(PLAYER1_ADDRESS + BOUNCE_CTR_OFFSET));
-		gs->player2.bounce_ctr = __builtin_popcount(*(unsigned char *)(PLAYER2_ADDRESS + BOUNCE_CTR_OFFSET));
-		//bits 1 2 4
+		gs->player1.bounce_ctr = *(unsigned char *)(PLAYER1_ADDRESS + BOUNCE_CTR_OFFSET);
+		gs->player2.bounce_ctr = *(unsigned char *)(PLAYER2_ADDRESS + BOUNCE_CTR_OFFSET);
+		//0 no bounce, 1 1st bounce, 2 2nd bounce, 3 3rd bounce, 4 too much bounce
 
 		gs->player1.situation = (*(unsigned char *)(PLAYER1_ADDRESS + SITUATION_OFFSET));
 		gs->player2.situation = (*(unsigned char *)(PLAYER2_ADDRESS + SITUATION_OFFSET));
