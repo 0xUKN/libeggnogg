@@ -25,6 +25,9 @@ namespace LibEggnogg
 	#define get_speed 2
 	extern  u_long * get_speed_3(void *, CLIENT *);
 	extern  u_long * get_speed_3_svc(void *, struct svc_req *);
+	#define get_roomdef 4
+	extern  char ** get_roomdef_3(void *, CLIENT *);
+	extern  char ** get_roomdef_3_svc(void *, struct svc_req *);
 	extern int libeggnogg_rpc_3_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 	#else /* K&R C */
@@ -35,6 +38,10 @@ namespace LibEggnogg
 	extern  u_long * get_speed_3();
 	extern  u_long * get_speed_3_svc();
 	extern int libeggnogg_rpc_3_freeresult ();
+	#define get_roomdef 4
+	extern  char ** get_roomdef_3();
+	extern  char ** get_roomdef_3_svc();
+
 	#endif /* K&R C */
 
 	extern void init_libeggnogg_rpc_serv();

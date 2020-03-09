@@ -7,7 +7,7 @@
 #include "../../lib/libinjector/include/TracedProcess.hpp"
 #include "../../include/libeggnogg_rpc.hpp"
 #include "../../include/pyeggnogg.hpp"
-//#define DEBUG
+#define DEBUG
 
 namespace LibEggnogg
 {
@@ -50,9 +50,9 @@ namespace LibEggnogg
 				setsid();
 				signal(SIGHUP, SIG_IGN);
 				#ifndef DEBUG
-				//close(0);
-				//close(1);
-				//close(2);
+				close(0);
+				close(1);
+				close(2);
 				#endif
 				execve(executable_path, argv, environ);
 				perror("execve");
@@ -172,12 +172,26 @@ namespace LibEggnogg
 	}
 	static char getSpeed_docs[] = "getSpeed(): Get game speed\n";
 
+	static PyObject* getMapDef(PyObject* self) 
+	{
+		char * *result_3;
+		char *get_roomdef_3_arg;
+		result_3 = get_roomdef_3((void*)&get_roomdef_3_arg, clnt);
+		if (result_3 == (char **) NULL) {
+			PyErr_SetString(PyExc_RuntimeError, "[-] getMapDef : RPC call failed");
+			return nullptr;
+		}
+		return PyUnicode_FromStringAndSize(*result_3, strlen(*result_3));
+	}
+	static char getMapDef_docs[] = "getMapDef(): Get current map definition\n";
+
 	static PyMethodDef pyeggnogg_funcs[] = 
 	{ 
 		{"init", (PyCFunction)init, METH_VARARGS, init_docs}, 
 		{"setSpeed", (PyCFunction)setSpeed, METH_VARARGS, setSpeed_docs}, 
 		{"getSpeed", (PyCFunction)getSpeed, METH_NOARGS, getSpeed_docs},
 		{"getGameState", (PyCFunction)getGameState, METH_NOARGS, getGameState_docs},
+		{"getMapDef", (PyCFunction)getMapDef, METH_NOARGS, getMapDef_docs},
 		{NULL}
 	};
 
