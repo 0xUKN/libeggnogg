@@ -21,7 +21,7 @@
 #define SWORD_POSY_OFFSET 0x58
 #define DIRECTION_OFFSET 0x98
 #define BOUNCE_CTR_OFFSET 0x90
-#define SITUATION_OFFSET 0xad
+#define CONTACT_POINT_OFFSET 0xad
 #define KEYS_PRESSED_OFFSET 0x9f
 #define ACTION_OFFSET 0x158
 #define PLAYER1_ADDRESS 0x75b3e0
@@ -138,8 +138,8 @@ namespace LibEggnogg
 			gs->player1.bounce_ctr = *(unsigned char *)(PLAYER1_ADDRESS + BOUNCE_CTR_OFFSET);
 			//0 no bounce, 1 1st bounce, 2 2nd bounce, 3 3rd bounce, 4 too much bounce
 
-			gs->player1.situation = (*(unsigned char *)(PLAYER1_ADDRESS + SITUATION_OFFSET));
-			//bits 0 JUMPING/FALLING, 1 AU SOL ( CAN JUMP), 8 AGGRIPPÉ AU MUR
+			gs->player1.contact_point = (*(unsigned char *)(PLAYER1_ADDRESS + CONTACT_POINT_OFFSET));
+			//bits 0x1 (floor contact), 0x2 (roof contact), 0x4 (right wall contact), 0x8 (left wall contact) => multiple contact posible
 
 			gs->player1.keys_pressed = (*(unsigned char *)(PLAYER1_ADDRESS + KEYS_PRESSED_OFFSET));
 			//bits up : 0x20, down : 0x10, left : 0x8, right : 0x4, jump : 0x2, attack : 0x1
@@ -211,7 +211,7 @@ namespace LibEggnogg
 			gs->player1.sword_pos_y = 0;
 			gs->player1.direction = 0;
 			gs->player1.bounce_ctr = 0;
-			gs->player1.situation = 0;
+			gs->player1.contact_point = 0;
 			gs->player1.keys_pressed = 0;
 			gs->player1.action = DEAD;
 		}
@@ -242,8 +242,8 @@ namespace LibEggnogg
 			gs->player2.bounce_ctr = *(unsigned char *)(PLAYER2_ADDRESS + BOUNCE_CTR_OFFSET);
 			//0 no bounce, 1 1st bounce, 2 2nd bounce, 3 3rd bounce, 4 too much bounce
 
-			gs->player2.situation = (*(unsigned char *)(PLAYER2_ADDRESS + SITUATION_OFFSET));
-			//bits 0 JUMPING/FALLING, 1 AU SOL ( CAN JUMP), 8 AGGRIPPÉ AU MUR
+			gs->player2.contact_point = (*(unsigned char *)(PLAYER2_ADDRESS + CONTACT_POINT_OFFSET));
+			//bits 0x1 (floor contact), 0x2 (roof contact), 0x4 (right wall contact), 0x8 (left wall contact) => multiple contact posible
 
 			gs->player2.keys_pressed = (*(unsigned char *)(PLAYER2_ADDRESS + KEYS_PRESSED_OFFSET)); 
 			//bits up : 0x20, down : 0x10, left : 0x8, right : 0x4, jump : 0x2, attack : 0x1
@@ -315,7 +315,7 @@ namespace LibEggnogg
 			gs->player2.sword_pos_y = 0;
 			gs->player2.direction = 0;
 			gs->player2.bounce_ctr = 0;
-			gs->player2.situation = 0;
+			gs->player2.contact_point = 0;
 			gs->player2.keys_pressed = 0;
 			gs->player2.action = DEAD;
 		}

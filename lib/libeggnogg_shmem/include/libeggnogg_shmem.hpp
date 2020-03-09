@@ -20,7 +20,7 @@ namespace LibEggnogg
 		float sword_pos_y;
 		signed char direction;
 		unsigned char bounce_ctr;
-		unsigned char situation;
+		unsigned char contact_point;
 		unsigned char keys_pressed;
 		PlayerAction action;
 	};
