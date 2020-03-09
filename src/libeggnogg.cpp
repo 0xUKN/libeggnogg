@@ -11,6 +11,10 @@
 //#define DEBUG
 #define LIBSDL_PREFIX "libSDL"
 #define SDL_NumJoysticks_GOT 0x665158
+#define WIN_HOOK_ADRESS
+#define WIN_HOOK_SIZE 
+
+#define GAME_RESET_FUNCTION 0x438930
 
 #define LOGIC_RATE_ADDRESS 0x665418
 #define PLAYER1_ADDRESS 0x75b3e0
@@ -19,7 +23,6 @@
 #define ROOM_NUMBER_ADDRESS 0x75b268
 #define TOTAL_ROOM_NUMBER_ADDRESS 0x763938
 #define NUM_THINGS_ALLOCATED_ADDRESS 0x75c880
-#define WIN_HOOK_ADRESS
 #define THINGS_ADDRESS 0x75b280
 #define ROOM_TEMPLATES_ADDRESS 0x772f70
 #define MAP_NAME_ADDRESS 0x0763928
@@ -38,7 +41,6 @@
 #define ACTION_OFFSET 0x158
 #define THINGS_SIZE 0x160
 #define ROOM_TEMPLATE_SIZE 0xe0
-#define WIN_HOOK_SIZE 
 
 namespace LibEggnogg
 {
@@ -388,5 +390,12 @@ namespace LibEggnogg
 	{
 		mapname_result = *((char **)(MAP_NAME_ADDRESS));
 		return &mapname_result;
+	}
+
+	void * game_reset_3_svc(void *argp, struct svc_req *rqstp)
+	{
+		static char * result;
+		((void (*)())GAME_RESET_FUNCTION)();
+		return (void *) &result;
 	}
 }

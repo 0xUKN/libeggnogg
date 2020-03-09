@@ -27,3 +27,5 @@ while True:
 		print("Current room definition :")
 		show_map(EggNogg.getRoomDef())
 		prev_map = gs['room_number']
+	if False and gs['winner'] != 0:
+		EggNogg.resetGame()

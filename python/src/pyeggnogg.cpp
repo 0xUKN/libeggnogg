@@ -198,6 +198,19 @@ namespace LibEggnogg
 	}
 	static char getMapName_docs[] = "getMapName(): Get current map name\n";
 
+	static PyObject* resetGame(PyObject* self) 
+	{
+		void  *result_5;
+		char *game_reset_3_arg;
+		result_5 = game_reset_3((void*)&game_reset_3_arg, clnt);
+		if (result_5 == (void *) NULL) {
+			clnt_perror (clnt, "[-] resetGame : RPC call failed");
+		}
+		return Py_None;
+	}
+
+	static char resetGame_docs[] = "resetGame(): reset the current game\n";
+
 	static PyMethodDef pyeggnogg_funcs[] = 
 	{ 
 		{"init", (PyCFunction)init, METH_VARARGS, init_docs}, 
@@ -206,6 +219,7 @@ namespace LibEggnogg
 		{"getGameState", (PyCFunction)getGameState, METH_NOARGS, getGameState_docs},
 		{"getRoomDef", (PyCFunction)getRoomDef, METH_NOARGS, getRoomDef_docs},
 		{"getMapName", (PyCFunction)getMapName, METH_NOARGS, getMapName_docs},
+		{"resetGame", (PyCFunction)resetGame, METH_NOARGS, resetGame_docs},
 		{NULL}
 	};
 
