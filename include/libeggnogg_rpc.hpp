@@ -28,6 +28,9 @@ namespace LibEggnogg
 	#define get_roomdef 4
 	extern  char ** get_roomdef_3(void *, CLIENT *);
 	extern  char ** get_roomdef_3_svc(void *, struct svc_req *);
+	#define get_mapname 5
+	extern  char ** get_mapname_3(void *, CLIENT *);
+	extern  char ** get_mapname_3_svc(void *, struct svc_req *);
 	extern int libeggnogg_rpc_3_freeresult (SVCXPRT *, xdrproc_t, caddr_t);
 
 	#else /* K&R C */
@@ -41,6 +44,9 @@ namespace LibEggnogg
 	#define get_roomdef 4
 	extern  char ** get_roomdef_3();
 	extern  char ** get_roomdef_3_svc();
+	#define get_mapname 5
+	extern  char ** get_mapname_3(void *, CLIENT *);
+	extern  char ** get_mapname_3_svc(void *, struct svc_req *);
 
 	#endif /* K&R C */
 

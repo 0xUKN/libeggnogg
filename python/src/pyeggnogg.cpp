@@ -172,9 +172,9 @@ namespace LibEggnogg
 	}
 	static char getSpeed_docs[] = "getSpeed(): Get game speed\n";
 
-	static PyObject* getMapDef(PyObject* self) 
+	static PyObject* getRoomDef(PyObject* self) 
 	{
-		char * *result_3;
+		char ** result_3;
 		char *get_roomdef_3_arg;
 		result_3 = get_roomdef_3((void*)&get_roomdef_3_arg, clnt);
 		if (result_3 == (char **) NULL) {
@@ -183,7 +183,20 @@ namespace LibEggnogg
 		}
 		return PyUnicode_FromStringAndSize(*result_3, strlen(*result_3));
 	}
-	static char getMapDef_docs[] = "getMapDef(): Get current map definition\n";
+	static char getRoomDef_docs[] = "getRoomDef(): Get current room definition\n";
+
+	static PyObject* getMapName(PyObject* self) 
+	{
+		char ** result_4;
+		char *get_mapname_3_arg;
+		result_4 = get_mapname_3((void*)&get_mapname_3_arg, clnt);
+		if (result_4 == (char **) NULL) {
+			PyErr_SetString(PyExc_RuntimeError, "[-] getMapName : RPC call failed");
+			return nullptr;
+		}
+		return PyUnicode_FromStringAndSize(*result_4, strlen(*result_4));
+	}
+	static char getMapName_docs[] = "getMapName(): Get current map name\n";
 
 	static PyMethodDef pyeggnogg_funcs[] = 
 	{ 
@@ -191,7 +204,8 @@ namespace LibEggnogg
 		{"setSpeed", (PyCFunction)setSpeed, METH_VARARGS, setSpeed_docs}, 
 		{"getSpeed", (PyCFunction)getSpeed, METH_NOARGS, getSpeed_docs},
 		{"getGameState", (PyCFunction)getGameState, METH_NOARGS, getGameState_docs},
-		{"getMapDef", (PyCFunction)getMapDef, METH_NOARGS, getMapDef_docs},
+		{"getRoomDef", (PyCFunction)getRoomDef, METH_NOARGS, getRoomDef_docs},
+		{"getMapName", (PyCFunction)getMapName, METH_NOARGS, getMapName_docs},
 		{NULL}
 	};
 

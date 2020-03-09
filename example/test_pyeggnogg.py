@@ -16,12 +16,14 @@ EggNogg.init(lib_path, executable_path)
 print("Current speed %d" % EggNogg.getSpeed())
 #EggNogg.setSpeed(15)
 print("Current speed : %d" % EggNogg.getSpeed())
-print("Current map definition :")
-show_map(EggNogg.getMapDef())
-
+prev_map = -1
+print("Playing on : %s" % EggNogg.getMapName())
 while True:
 	time.sleep(1)
-	#gs = EggNogg.getGameState()
-	#print(gs)
-	#print("\n")
-	show_map(EggNogg.getMapDef())
+	gs = EggNogg.getGameState()
+	print(gs)
+	print("\n")
+	if gs['room_number'] != prev_map:
+		print("Current room definition :")
+		show_map(EggNogg.getRoomDef())
+		prev_map = gs['room_number']

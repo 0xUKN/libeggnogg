@@ -22,6 +22,7 @@
 #define WIN_HOOK_ADRESS
 #define THINGS_ADDRESS 0x75b280
 #define ROOM_TEMPLATES_ADDRESS 0x772f70
+#define MAP_NAME_ADDRESS 0x0763928
 
 #define ISDEAD_OFFSET 0x2
 #define LIFE_OFFSET 0x9a
@@ -380,5 +381,12 @@ namespace LibEggnogg
 		room_number_in_mapdef = (room_number_in_mapdef < 0) ? -room_number_in_mapdef : room_number_in_mapdef;
 		roomdef_result = *((char **)(ROOM_TEMPLATES_ADDRESS + room_number_in_mapdef * ROOM_TEMPLATE_SIZE));
 		return &roomdef_result;
+	}
+
+	static char * mapname_result;
+	char ** get_mapname_3_svc(void *argp, struct svc_req *rqstp)
+	{
+		mapname_result = *((char **)(MAP_NAME_ADDRESS));
+		return &mapname_result;
 	}
 }

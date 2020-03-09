@@ -52,6 +52,12 @@ namespace LibEggnogg
 			local = (char *(*)(char *, struct svc_req *)) get_roomdef_3_svc;
 			break;
 
+		case get_mapname:
+			_xdr_argument = (xdrproc_t) xdr_void;
+			_xdr_result = (xdrproc_t) xdr_wrapstring;
+			local = (char *(*)(char *, struct svc_req *)) get_mapname_3_svc;
+			break;
+
 		default:
 			svcerr_noproc (transp);
 			return;
