@@ -9,7 +9,10 @@ namespace LibEggnogg
 
 	struct Player 
 	{
+		bool isAlive;
 		unsigned char life;
+		float last_pos_x;
+		float last_pos_y;
 		float pos_x;
 		float pos_y;
 		bool hasSword;

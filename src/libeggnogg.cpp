@@ -12,6 +12,7 @@
 #define LIBSDL_PREFIX "libSDL"
 #define SDL_NumJoysticks_GOT 0x665158
 #define LOGIC_RATE_ADDRESS 0x665418
+#define ISDEAD_OFFSET 0x2
 #define LIFE_OFFSET 0x9a
 #define POSX_OFFSET 0x24
 #define POSY_OFFSET 0x28
@@ -108,163 +109,215 @@ namespace LibEggnogg
 	//Shared Memory Functions
 	void UpdateGameState()
 	{
-		gs->player1.life = *(unsigned char *)(PLAYER1_ADDRESS + LIFE_OFFSET);
-		gs->player2.life = *(unsigned char *)(PLAYER2_ADDRESS + LIFE_OFFSET);
+		gs->player1.isAlive = !(*(bool *)(PLAYER1_ADDRESS + ISDEAD_OFFSET));
+		gs->player2.isAlive = !(*(bool *)(PLAYER2_ADDRESS + ISDEAD_OFFSET));
 
-		gs->player1.pos_x = *(float *)(PLAYER1_ADDRESS + POSX_OFFSET);
-		gs->player2.pos_x = *(float *)(PLAYER2_ADDRESS + POSX_OFFSET);
-
-		gs->player1.pos_y = *(float *)(PLAYER1_ADDRESS + POSY_OFFSET);
-		gs->player2.pos_y = *(float *)(PLAYER2_ADDRESS + POSY_OFFSET);
-
-		gs->player1.hasSword = !(*(bool *)(PLAYER1_ADDRESS + ISDISARMED_OFFSET));
-		gs->player2.hasSword = !(*(bool *)(PLAYER2_ADDRESS + ISDISARMED_OFFSET));
-		
-		if(gs->player1.hasSword)
+		if(gs->player1.isAlive)
 		{
-			gs->player1.sword_pos_x = *(float *)(PLAYER1_ADDRESS + SWORD_POSX_OFFSET);
-			gs->player1.sword_pos_y = *(float *)(PLAYER1_ADDRESS + SWORD_POSY_OFFSET);
+			gs->player1.life = *(unsigned char *)(PLAYER1_ADDRESS + LIFE_OFFSET);
+			gs->player1.pos_x = *(float *)(PLAYER1_ADDRESS + POSX_OFFSET);
+			gs->player1.pos_y = *(float *)(PLAYER1_ADDRESS + POSY_OFFSET);
+			gs->player1.last_pos_x = gs->player1.pos_x;
+			gs->player1.last_pos_y = gs->player1.pos_y;
+			gs->player1.hasSword = !(*(bool *)(PLAYER1_ADDRESS + ISDISARMED_OFFSET));
+
+			if(gs->player1.hasSword)
+			{
+				gs->player1.sword_pos_x = *(float *)(PLAYER1_ADDRESS + SWORD_POSX_OFFSET);
+				gs->player1.sword_pos_y = *(float *)(PLAYER1_ADDRESS + SWORD_POSY_OFFSET);
+			}
+			else
+			{
+				gs->player1.sword_pos_x = 0;
+				gs->player1.sword_pos_y = 0;
+			}
+
+			gs->player1.direction = (*(signed char *)(PLAYER1_ADDRESS + DIRECTION_OFFSET));
+			//-1 left +1 right
+
+			gs->player1.bounce_ctr = *(unsigned char *)(PLAYER1_ADDRESS + BOUNCE_CTR_OFFSET);
+			//0 no bounce, 1 1st bounce, 2 2nd bounce, 3 3rd bounce, 4 too much bounce
+
+			gs->player1.situation = (*(unsigned char *)(PLAYER1_ADDRESS + SITUATION_OFFSET));
+			//bits 0 JUMPING/FALLING, 1 AU SOL ( CAN JUMP), 8 AGGRIPPÉ AU MUR
+
+			gs->player1.keys_pressed = (*(unsigned char *)(PLAYER1_ADDRESS + KEYS_PRESSED_OFFSET));
+			//bits up : 0x20, down : 0x10, left : 0x8, right : 0x4, jump : 0x2, attack : 0x1
+
+			switch((*(unsigned long*)(PLAYER1_ADDRESS + ACTION_OFFSET)))
+			{
+				case 0x42aec0:
+					gs->player1.action = DEAD;
+					break;
+
+				case 0x43fbf0:
+					gs->player1.action = DUCK; //SLIDE
+					break;
+
+				case 0x440e00:
+					gs->player1.action = EGGNOGG; //WIN
+					break;
+
+				case 0x43e740:
+					gs->player1.action = JUMP;
+					break;
+
+				case 0x43dd90:
+					gs->player1.action = KICK;
+					break;
+
+				case 0x441f30:
+					gs->player1.action = NOTHING;
+					break;
+
+				case 0x43a700:
+					gs->player1.action = PUNCH;
+					break;
+
+				case 0x43c4b0:
+					gs->player1.action = RUN;
+					break;
+
+				case 0x43d2a0:
+					gs->player1.action = STAB;
+					break;
+
+				case 0x43b240:
+					gs->player1.action = STANCE;
+					break;
+
+				case 0x4407e0:
+					gs->player1.action = STUN;
+					break;
+
+				case 0x43f6d0:
+					gs->player1.action = THROW;
+					break;
+
+				default:
+					gs->player1.action = DEFAULT;
+					break;
+			}
 		}
 		else
 		{
-			gs->player1.sword_pos_x = -1;
-			gs->player1.sword_pos_y = -1;
-		}	
-		if(gs->player2.hasSword)
+			gs->player1.life = 0;
+			gs->player1.last_pos_x = gs->player1.pos_x != 0 ? gs->player1.pos_x : gs->player1.last_pos_x;
+			gs->player1.last_pos_y = gs->player1.pos_y != 0 ? gs->player1.pos_y : gs->player1.last_pos_y;
+			gs->player1.pos_x = 0;
+			gs->player1.pos_y = 0;
+			gs->player1.hasSword = false;
+			gs->player1.sword_pos_x = 0;
+			gs->player1.sword_pos_y = 0;
+			gs->player1.direction = 0;
+			gs->player1.bounce_ctr = 0;
+			gs->player1.situation = 0;
+			gs->player1.keys_pressed = 0;
+			gs->player1.action = DEAD;
+		}
+
+		if(gs->player2.isAlive)
 		{
-			gs->player2.sword_pos_x = *(float *)(PLAYER2_ADDRESS + SWORD_POSX_OFFSET);
-			gs->player2.sword_pos_y = *(float *)(PLAYER2_ADDRESS + SWORD_POSY_OFFSET);
+			gs->player2.life = *(unsigned char *)(PLAYER2_ADDRESS + LIFE_OFFSET);
+			gs->player2.pos_x = *(float *)(PLAYER2_ADDRESS + POSX_OFFSET);
+			gs->player2.pos_y = *(float *)(PLAYER2_ADDRESS + POSY_OFFSET);
+			gs->player2.last_pos_x = gs->player2.pos_x;
+			gs->player2.last_pos_y = gs->player2.pos_y;
+			gs->player2.hasSword = !(*(bool *)(PLAYER2_ADDRESS + ISDISARMED_OFFSET));
+	
+			if(gs->player2.hasSword)
+			{
+				gs->player2.sword_pos_x = *(float *)(PLAYER2_ADDRESS + SWORD_POSX_OFFSET);
+				gs->player2.sword_pos_y = *(float *)(PLAYER2_ADDRESS + SWORD_POSY_OFFSET);
+			}
+			else
+			{
+				gs->player2.sword_pos_x = 0;
+				gs->player2.sword_pos_y = 0;
+			}
+
+			gs->player2.direction = (*(signed char *)(PLAYER2_ADDRESS + DIRECTION_OFFSET));
+			//-1 left +1 right
+
+			gs->player2.bounce_ctr = *(unsigned char *)(PLAYER2_ADDRESS + BOUNCE_CTR_OFFSET);
+			//0 no bounce, 1 1st bounce, 2 2nd bounce, 3 3rd bounce, 4 too much bounce
+
+			gs->player2.situation = (*(unsigned char *)(PLAYER2_ADDRESS + SITUATION_OFFSET));
+			//bits 0 JUMPING/FALLING, 1 AU SOL ( CAN JUMP), 8 AGGRIPPÉ AU MUR
+
+			gs->player2.keys_pressed = (*(unsigned char *)(PLAYER2_ADDRESS + KEYS_PRESSED_OFFSET)); 
+			//bits up : 0x20, down : 0x10, left : 0x8, right : 0x4, jump : 0x2, attack : 0x1
+
+			switch((*(unsigned long*)(PLAYER2_ADDRESS + ACTION_OFFSET)))
+			{
+				case 0x42aec0:
+					gs->player2.action = DEAD;
+					break;
+
+				case 0x43fbf0:
+					gs->player2.action = DUCK; //SLIDE
+					break;
+
+				case 0x440e00:
+					gs->player2.action = EGGNOGG; //WIN
+					break;
+
+				case 0x43e740:
+					gs->player2.action = JUMP;
+					break;
+
+				case 0x43dd90:
+					gs->player2.action = KICK;
+					break;
+
+				case 0x441f30:
+					gs->player2.action = NOTHING;
+					break;
+
+				case 0x43a700:
+					gs->player2.action = PUNCH;
+					break;
+
+				case 0x43c4b0:
+					gs->player2.action = RUN;
+					break;
+
+				case 0x43d2a0:
+					gs->player2.action = STAB;
+					break;
+
+				case 0x43b240:
+					gs->player2.action = STANCE;
+					break;
+
+				case 0x4407e0:
+					gs->player2.action = STUN;
+					break;
+
+				case 0x43f6d0:
+					gs->player2.action = THROW;
+					break;
+
+				default:
+					gs->player2.action = DEFAULT;
+					break;
+			}
 		}
 		else
 		{
-			gs->player2.sword_pos_x = -1;
-			gs->player2.sword_pos_y = -1;
-		}
-
-		gs->player1.direction = (*(signed char *)(PLAYER1_ADDRESS + DIRECTION_OFFSET));
-		gs->player2.direction = (*(signed char *)(PLAYER2_ADDRESS + DIRECTION_OFFSET));
-		//-1 left +1 right
-
-		gs->player1.bounce_ctr = *(unsigned char *)(PLAYER1_ADDRESS + BOUNCE_CTR_OFFSET);
-		gs->player2.bounce_ctr = *(unsigned char *)(PLAYER2_ADDRESS + BOUNCE_CTR_OFFSET);
-		//0 no bounce, 1 1st bounce, 2 2nd bounce, 3 3rd bounce, 4 too much bounce
-
-		gs->player1.situation = (*(unsigned char *)(PLAYER1_ADDRESS + SITUATION_OFFSET));
-		gs->player2.situation = (*(unsigned char *)(PLAYER2_ADDRESS + SITUATION_OFFSET));
-		//bits 0 JUMPING/FALLING, 1 AU SOL ( CAN JUMP), 8 AGGRIPPÉ AU MUR
-
-		gs->player1.keys_pressed = (*(unsigned char *)(PLAYER1_ADDRESS + KEYS_PRESSED_OFFSET));
-		gs->player2.keys_pressed = (*(unsigned char *)(PLAYER2_ADDRESS + KEYS_PRESSED_OFFSET)); 
-		//bits up : 0x20, down : 0x10, left : 0x8, right : 0x4, jump : 0x2, attack : 0x1
-
-		switch((*(unsigned long*)(PLAYER1_ADDRESS + ACTION_OFFSET)))
-		{
-			case 0x42aec0:
-				gs->player1.action = DEAD;
-				break;
-
-			case 0x43fbf0:
-				gs->player1.action = DUCK; //SLIDE
-				break;
-
-			case 0x440e00:
-				gs->player1.action = EGGNOGG; //WIN
-				break;
-
-			case 0x43e740:
-				gs->player1.action = JUMP;
-				break;
-
-			case 0x43dd90:
-				gs->player1.action = KICK;
-				break;
-
-			case 0x441f30:
-				gs->player1.action = NOTHING;
-				break;
-
-			case 0x43a700:
-				gs->player1.action = PUNCH;
-				break;
-
-			case 0x43c4b0:
-				gs->player1.action = RUN;
-				break;
-
-			case 0x43d2a0:
-				gs->player1.action = STAB;
-				break;
-
-			case 0x43b240:
-				gs->player1.action = STANCE;
-				break;
-
-			case 0x4407e0:
-				gs->player1.action = STUN;
-				break;
-
-			case 0x43f6d0:
-				gs->player1.action = THROW;
-				break;
-
-			default:
-				gs->player1.action = DEFAULT;
-				break;
-		}
-
-		switch((*(unsigned long*)(PLAYER2_ADDRESS + ACTION_OFFSET)))
-		{
-			case 0x42aec0:
-				gs->player2.action = DEAD;
-				break;
-
-			case 0x43fbf0:
-				gs->player2.action = DUCK; //SLIDE
-				break;
-
-			case 0x440e00:
-				gs->player2.action = EGGNOGG; //WIN
-				break;
-
-			case 0x43e740:
-				gs->player2.action = JUMP;
-				break;
-
-			case 0x43dd90:
-				gs->player2.action = KICK;
-				break;
-
-			case 0x441f30:
-				gs->player2.action = NOTHING;
-				break;
-
-			case 0x43a700:
-				gs->player2.action = PUNCH;
-				break;
-
-			case 0x43c4b0:
-				gs->player2.action = RUN;
-				break;
-
-			case 0x43d2a0:
-				gs->player2.action = STAB;
-				break;
-
-			case 0x43b240:
-				gs->player2.action = STANCE;
-				break;
-
-			case 0x4407e0:
-				gs->player2.action = STUN;
-				break;
-
-			case 0x43f6d0:
-				gs->player2.action = THROW;
-				break;
-
-			default:
-				gs->player2.action = DEFAULT;
-				break;
+			gs->player2.life = 0;
+			gs->player2.last_pos_x = gs->player2.pos_x;
+			gs->player2.last_pos_y = gs->player2.pos_y;
+			gs->player2.pos_x = 0;
+			gs->player2.pos_y = 0;
+			gs->player2.hasSword = false;
+			gs->player2.sword_pos_x = 0;
+			gs->player2.sword_pos_y = 0;
+			gs->player2.direction = 0;
+			gs->player2.bounce_ctr = 0;
+			gs->player2.situation = 0;
+			gs->player2.keys_pressed = 0;
+			gs->player2.action = DEAD;
 		}
 
 		if(*(unsigned long *)(LEADER_ADDRESS) == PLAYER1_ADDRESS)
