@@ -5,6 +5,7 @@ namespace LibEggnogg
 {
 	static 	CLIENT *clnt;
 	static GameState* gs;
+	void exit_rpc_clnt_wrapper();
 
 	static PyObject* init(PyObject* self, PyObject* args);
 	static PyObject* setSpeed(PyObject* self, PyObject* args);

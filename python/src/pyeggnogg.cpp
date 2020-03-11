@@ -5,12 +5,18 @@
 #include <limits.h>
 #include <unistd.h>
 #include "../../lib/libinjector/include/TracedProcess.hpp"
+#include "../../lib/libeggnogg_shmem/include/libeggnogg_shmem.hpp"
 #include "../../include/libeggnogg_rpc.hpp"
 #include "../../include/pyeggnogg.hpp"
 #define DEBUG
 
 namespace LibEggnogg
 {
+	void exit_rpc_clnt_wrapper()
+	{
+		exit_libeggnogg_rpc_clnt(clnt);
+	}
+
 	static PyObject* init(PyObject* self, PyObject* args) 
 	{
 		char library_path[PATH_MAX];
@@ -18,6 +24,9 @@ namespace LibEggnogg
 		char executable_path_cpy[PATH_MAX];
 		char* library_name;
 		char* executable_name;
+
+		atexit(exit_rpc_clnt_wrapper);
+
 		if(!PyArg_ParseTuple(args, "ss", &library_name, &executable_name))
 		{
 			return nullptr;
@@ -73,7 +82,7 @@ namespace LibEggnogg
 		delete proc;
 
 		sleep(1);
-		clnt = clnt_create("localhost", LibEggnogg_RPC, Stable, "udp");
+		clnt = init_libeggnogg_rpc_clnt();
 		if (clnt == NULL) {
 			clnt_pcreateerror("localhost");
 			PyErr_SetString(PyExc_RuntimeError, "[-] Failed to initialize RPC client");

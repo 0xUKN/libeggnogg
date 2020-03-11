@@ -14,9 +14,8 @@ namespace LibEggnogg
 {
 	void* CreateSharedMemory(std::string name, unsigned int size)
 	{
-		int shm_fd;
 		void* ptr;
-		shm_fd = shm_open(name.c_str(), O_CREAT | O_RDWR, 0666);
+		int shm_fd = shm_open(name.c_str(), O_CREAT | O_RDWR, 0666);
 		if(shm_fd == -1)
 		{
 			perror("shm_fd");
@@ -36,14 +35,12 @@ namespace LibEggnogg
 		return ptr;
 	}
 
-	int RemoveSharedMemory(std::string name)
+	void RemoveSharedMemory()
 	{
-		return shm_unlink(name.c_str());
-	}
-
-	void CloseSharedMemory()
-	{
-		RemoveSharedMemory(SHMEM);
+		if(shm_unlink(SHMEM) == -1)
+		{
+			perror("shm_unlink");
+		}
 	}
 
 	GameState* InitGameState()

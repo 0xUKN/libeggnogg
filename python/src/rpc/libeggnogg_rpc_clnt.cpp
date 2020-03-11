@@ -12,6 +12,16 @@ namespace LibEggnogg
 	/* Default timeout can be changed using clnt_control() */
 	static struct timeval TIMEOUT = { 25, 0 };
 
+	void exit_libeggnogg_rpc_clnt(CLIENT *clnt) 
+	{ 
+		clnt_destroy(clnt);
+	}
+
+	CLIENT * init_libeggnogg_rpc_clnt() 
+	{ 
+		return clnt_create("localhost", LibEggnogg_RPC, Stable, "udp"); 
+	}
+
 	void *
 	set_speed_3(u_long *argp, CLIENT *clnt)
 	{

@@ -54,7 +54,7 @@ namespace LibEggnogg
 		std::thread background_task(init_libeggnogg_rpc_serv); 
 		background_task.detach();
 		atexit(exit_libeggnogg_rpc_serv);
-		atexit(CloseSharedMemory);
+		atexit(RemoveSharedMemory);
 
 		logic_rate = (unsigned long*)LOGIC_RATE_ADDRESS;
 		SDL_NumJoysticks_real_GOT = (void**)SDL_NumJoysticks_GOT;

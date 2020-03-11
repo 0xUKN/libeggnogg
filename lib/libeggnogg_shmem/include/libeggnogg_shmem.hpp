@@ -47,7 +47,6 @@ namespace LibEggnogg
 	typedef struct GameState GameState;
 
 	void* CreateSharedMemory(std::string name, unsigned int size);
-	int RemoveSharedMemory(std::string name);
+	void RemoveSharedMemory();
 	GameState* InitGameState();
-	void CloseSharedMemory();
 }

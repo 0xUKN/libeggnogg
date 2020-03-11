@@ -58,6 +58,8 @@ namespace LibEggnogg
 
 	extern void init_libeggnogg_rpc_serv();
 	extern void exit_libeggnogg_rpc_serv();
+	extern CLIENT * init_libeggnogg_rpc_clnt();
+	extern void exit_libeggnogg_rpc_clnt(CLIENT *clnt);
 
 	#ifdef __cplusplus
 	}
