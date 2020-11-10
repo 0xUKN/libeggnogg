@@ -1,6 +1,10 @@
 # libeggnogg
 *Binary instrumentation library for EGGNOGG+ by Madgarden*
 
+## Todos
+- Add multi-instance compatibility (play on several game at the same time)
+- Add a way to insert inputs directly in memory
+
 ## Requirements
 - rpcbind
 
